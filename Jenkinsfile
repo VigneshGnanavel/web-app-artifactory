@@ -18,6 +18,7 @@ pipeline {
     stage('Upload to Artifactory') {
       agent {
         docker {
+          bat 'cd C:\ProgramData\Jenkins\.jenkins\workspace\web-app-artifactory'
           image 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2:2.2.0' 
           reuseNode true
         }
