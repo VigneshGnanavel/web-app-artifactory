@@ -6,6 +6,8 @@ pipeline {
   environment {
     CI = true
     ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
+    JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
+    PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
   }
   stages {
     stage('Build') {
