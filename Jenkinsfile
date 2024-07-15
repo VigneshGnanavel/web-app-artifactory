@@ -26,7 +26,7 @@ pipeline {
                         bat 'git config --global user.name "VigneshGnanavel"'
                         bat 'git config --global user.email "prathvikvignesh@gmail.com"'
                         bat 'git checkout -B results'
-                        bat 'git add target/demo-0.0.1-SNAPSHOT.jar'
+                        bat 'git add -f target/demo-0.0.1-SNAPSHOT.jar'
                         bat 'git commit -m "Adding test results"'
                         bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/junittesing.git"
                     }
