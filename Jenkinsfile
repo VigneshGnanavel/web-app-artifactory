@@ -27,7 +27,10 @@ pipeline {
         HOME = '/workspace' // Set the home directory to the workspace
       }
       steps {
-        bat 'jfrog rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} C:/ProgramData/Jenkins/.jenkins/workspace/web-app-artifactory/target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/'
+        sh '''
+          jfrog rt config --url http://localhost:8081/artifactory --access-token ${ARTIFACTORY_ACCESS_TOKEN}
+          jfrog rt upload --url http://localhost:8081/artifactory --access-token ${ARTIFACTORY_ACCESS_TOKEN} /workspace/target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/
+        '''
       }
     }
   }
