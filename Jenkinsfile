@@ -4,7 +4,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    CI = true
+    CI = 'true'
     ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
   }
   stages {
@@ -16,12 +16,14 @@ pipeline {
     stage('Upload to Artifactory') {
       agent {
         docker {
-          image 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2:2.2.0' 
+          image 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2:2.2.0'
           reuseNode true
         }
       }
       steps {
-        sh 'jfrog rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/'
+        script {
+          sh 'jfrog rt upload --url http://172.17.208.1:8082/artifactory/ --access-token $ARTIFACTORY_ACCESS_TOKEN target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/'
+        }
       }
     }
   }
