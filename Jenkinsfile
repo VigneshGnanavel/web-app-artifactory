@@ -28,7 +28,7 @@ pipeline {
                         bat 'git checkout -B results'
                         bat 'git add -f target/demo-0.0.1-SNAPSHOT.jar'
                         bat 'git commit -m "Adding test results"'
-                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/junittesing.git"
+                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/web-app-artifactory.gitt"
                     }
                 }
             }
