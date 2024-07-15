@@ -18,7 +18,9 @@ pipeline {
                 bat './mvnw clean install'
             }
         }
-    steps {
+        
+        stage('Git Commit and Push') {
+            steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'jenkins', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         bat 'git config --global user.name "VigneshGnanavel"'
@@ -26,11 +28,12 @@ pipeline {
                         bat 'git checkout -B results'
                         bat 'git add target/demo-0.0.1-SNAPSHOT.jar'
                         bat 'git commit -m "Adding test results"'
-                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/junittesing.git results"
+                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/junittesing.git"
                     }
                 }
             }
         }
+        
         stage('Upload to Artifactory') {
             steps {
                 script {
