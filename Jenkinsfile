@@ -18,8 +18,8 @@ pipeline {
     stage('Upload to Artifactory') {
       agent {
         docker {
-          image 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2:2.2.0' 
-          args '-v /c/ProgramData/Jenkins/.jenkins/workspace/web-app-artifactory:/workspace' 
+          image 'releases-docker.jfrog.io/jfrog/jfrog-cli-v2:2.2.0'
+          args '-v /c/ProgramData/Jenkins/.jenkins/workspace/web-app-artifactory:/workspace -w /workspace'
           reuseNode true
         }
       }
@@ -27,7 +27,7 @@ pipeline {
         HOME = '/workspace' // Set the home directory to the workspace
       }
       steps {
-        bat 'jfrog rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/'
+        bat 'jfrog rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} C:/ProgramData/Jenkins/.jenkins/workspace/web-app-artifactory/target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/'
       }
     }
   }
