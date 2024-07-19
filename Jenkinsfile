@@ -12,13 +12,6 @@ pipeline {
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
     }
 
-    stages {
-        stage('Install Snyk CLI') {
-            steps {
-                bat 'npm install -g snyk'
-            }
-        }
-
         stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/VigneshGnanavel/web-app-artifactory.git', branch: 'main'
@@ -31,10 +24,9 @@ pipeline {
             }
         }
 
-       
         stage('Generate SBOM') {
             steps {
-                bat 'syft packages dir:. --scope AllLayers -o json > ./java-syft-sbom.json'
+                bat 'syft packages dir:. --scope AllLayers -o json > java-syft-sbom.json'
             }
         }
 
@@ -53,6 +45,8 @@ pipeline {
             steps {
                 script {
                     bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} java-syft-sbom.json web-app-artifactory/"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} snyk_report.json web-app-artifactory/"
                 }
             }
         }
@@ -68,7 +62,7 @@ pipeline {
                         bat 'git add -f java-syft-sbom.json'
                         bat 'git add -f snyk_report.json'
                         bat 'git commit -m "Adding build artifact, SBOM, and Snyk report"'
-                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/web-app-artifactory.git"
+                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/web-app-artifactory.git results"
                     }
                 }
             }
