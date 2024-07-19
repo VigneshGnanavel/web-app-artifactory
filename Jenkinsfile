@@ -38,6 +38,17 @@ pipeline {
             }
         }
 
+        stage('Snyk Security Testing') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
+                        bat "snyk auth ${env.SNYK_API_TOKEN}"
+                        bat "snyk test --all-projects --json > snyk_report.json"
+                    }
+                }
+            }
+        }
+
         stage('Upload to Artifactory') {
             steps {
                 script {
