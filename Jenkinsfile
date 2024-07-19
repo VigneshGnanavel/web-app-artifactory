@@ -12,6 +12,13 @@ pipeline {
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
     }
 
+    stages {
+        stage('Install Snyk CLI') {
+            steps {
+                bat 'npm install -g snyk'
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/VigneshGnanavel/web-app-artifactory.git', branch: 'main'
