@@ -31,10 +31,23 @@ pipeline {
             }
         }
         
+        stage('Snyk Security Testing') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
+                        bat "snyk auth ${env.SNYK_API_TOKEN}"
+                        bat "snyk test --all-projects --json > snyk_report.json"
+                    }
+                }
+            }
+        }
+        
         stage('Upload to Artifactory') {
             steps {
                 script {
                     bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} java-syft-sbom.json web-app-artifactory/"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} snyk_report.json web-app-artifactory/"
                 }
             }
         }
@@ -48,7 +61,8 @@ pipeline {
                         bat 'git checkout -B results'
                         bat 'git add -f target/demo-0.0.1-SNAPSHOT.jar'
                         bat 'git add -f java-syft-sbom.json'
-                        bat 'git commit -m "Adding build artifact and SBOM"'
+                        bat 'git add -f snyk_report.json'
+                        bat 'git commit -m "Adding build artifact, SBOM, and Snyk report"'
                         bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/web-app-artifactory.git"
                     }
                 }
