@@ -1,49 +1,55 @@
 pipeline {
     agent any
-  
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
     }
-  
+
     environment {
         CI = true
         ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
     }
-  
+
     stages {
+        stage('Install Snyk CLI') {
+            steps {
+                bat 'npm install -g snyk'
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/VigneshGnanavel/web-app-artifactory.git', branch: 'main'
             }
         }
-        
+
         stage('Build') {
             steps {
                 bat './mvnw clean install'
             }
         }
-        
+
         stage('Snyk Security Testing') {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
-                        bat "snyk auth ${env.SNYK_API_TOKEN}"
-                        bat "snyk test --all-projects --json > snyk_report.json"
+                        withEnv(["SNYK_TOKEN=${SNYK_API_TOKEN}"]) {
+                            bat 'snyk auth'
+                            bat 'snyk test --all-projects --json > snyk_report.json'
+                        }
                     }
                 }
             }
         }
-        
-        
+
         stage('Generate SBOM') {
             steps {
                 bat 'syft packages dir:. --scope AllLayers -o json > ./java-syft-sbom.json'
             }
         }
-        
-        
+
         stage('Upload to Artifactory') {
             steps {
                 script {
@@ -53,7 +59,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Git Commit and Push Results') {
             steps {
                 script {
