@@ -9,7 +9,7 @@ pipeline {
         CI = true
         ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
-        PATH = "${JAVA_HOME}\\bin;${PATH}"
+        PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
     }
   
     stages {
@@ -34,10 +34,16 @@ pipeline {
             }
         }
         
+        stage('Generate SBOM') {
+            steps {
+                bat 'syft packages dir:. --scope AllLayers'
+            }
+        }
+        
         stage('Upload to Artifactory') {
             steps {
                 script {
-                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/"
                 }
             }
         }
