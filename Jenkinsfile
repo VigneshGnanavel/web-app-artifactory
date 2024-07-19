@@ -36,7 +36,7 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
                         withEnv(["SNYK_TOKEN=${SNYK_API_TOKEN}"]) {
-                            bat 'snyk auth'
+                            bat 'echo %SNYK_TOKEN% | snyk auth'
                             bat 'snyk test --all-projects --json > snyk_report.json'
                         }
                     }
