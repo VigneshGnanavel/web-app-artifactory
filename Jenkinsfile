@@ -13,24 +13,15 @@ pipeline {
     }
   
     stages {
-        stage('Build') {
+        stage('Checkout Code') {
             steps {
-                bat './mvnw clean install'
+                git url: 'https://github.com/VigneshGnanavel/web-app-artifactory.git', branch: 'main'
             }
         }
         
-        stage('Git Commit and Push') {
+        stage('Build') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'jenkins', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                        bat 'git config --global user.name "VigneshGnanavel"'
-                        bat 'git config --global user.email "prathvikvignesh@gmail.com"'
-                        bat 'git checkout -B results'
-                        bat 'git add -f target/demo-0.0.1-SNAPSHOT.jar'
-                        bat 'git commit -m "Adding test results"'
-                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/web-app-artifactory.git"
-                    }
-                }
+                bat './mvnw clean install'
             }
         }
         
@@ -44,6 +35,22 @@ pipeline {
             steps {
                 script {
                     bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar web-app-artifactory/"
+                }
+            }
+        }
+        
+        stage('Git Commit and Push Results') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'jenkins', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        bat 'git config --global user.name "VigneshGnanavel"'
+                        bat 'git config --global user.email "prathvikvignesh@gmail.com"'
+                        bat 'git checkout -B results'
+                        bat 'git add -f target/demo-0.0.1-SNAPSHOT.jar'
+                        bat 'git add -f java-syft-sbom.json'
+                        bat 'git commit -m "Adding build artifact and SBOM"'
+                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/VigneshGnanavel/web-app-artifactory.git"
+                    }
                 }
             }
         }
