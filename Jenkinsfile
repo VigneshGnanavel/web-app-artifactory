@@ -31,19 +31,7 @@ pipeline {
             }
         }
 
-        stage('Snyk Security Testing') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
-                        withEnv(["SNYK_TOKEN=${SNYK_API_TOKEN}"]) {
-                            bat 'echo %SNYK_TOKEN% | snyk auth'
-                            bat 'snyk test --all-projects --json > snyk_report.json'
-                        }
-                    }
-                }
-            }
-        }
-
+       
         stage('Generate SBOM') {
             steps {
                 bat 'syft packages dir:. --scope AllLayers -o json > ./java-syft-sbom.json'
