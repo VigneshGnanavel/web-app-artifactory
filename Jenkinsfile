@@ -36,7 +36,7 @@ pipeline {
         
         stage('Generate SBOM') {
             steps {
-                bat 'syft packages dir:. --scope AllLayers -o json > ./java-docker-sbom.json'
+                bat 'syft packages dir:. --scope AllLayers -o json > ./java-syft-sbom.json'
             }
         }
         
