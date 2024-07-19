@@ -1,11 +1,6 @@
 pipeline {
     agent any
     stages {
-        stage('Delete image if exists') {
-            steps {
-                bat 'docker rmi java-docker:latest'
-            }
-        }
         stage('Create container image') {
             steps {
                 bat 'docker build --tag java-docker:latest .'
