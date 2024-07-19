@@ -25,12 +25,6 @@ pipeline {
             }
         }
         
-        stage('Generate SBOM') {
-            steps {
-                bat 'syft packages dir:. --scope AllLayers -o json > ./java-syft-sbom.json'
-            }
-        }
-        
         stage('Snyk Security Testing') {
             steps {
                 script {
@@ -41,6 +35,14 @@ pipeline {
                 }
             }
         }
+        
+        
+        stage('Generate SBOM') {
+            steps {
+                bat 'syft packages dir:. --scope AllLayers -o json > ./java-syft-sbom.json'
+            }
+        }
+        
         
         stage('Upload to Artifactory') {
             steps {
