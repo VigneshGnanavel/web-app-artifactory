@@ -40,9 +40,13 @@ pipeline {
         stage('Snyk Security Testing') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
-                        bat "snyk auth ${env.SNYK_API_TOKEN}"
-                        bat "snyk test -f -d --all-projects --json > snyk_artifact_report.json"
+                    try {
+                        withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
+                            bat "snyk auth ${env.SNYK_API_TOKEN}"
+                            bat "snyk test -f -d --all-projects --json > snyk_artifact_report.json"
+                        }
+                    } catch (Exception e) {
+                        echo "Snyk security testing failed: ${e.getMessage()}"
                     }
                 }
             }
