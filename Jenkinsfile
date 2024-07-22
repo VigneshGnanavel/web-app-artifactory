@@ -25,18 +25,29 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                bat './mvnw clean install'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                bat './mvnw test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        
         stage('Snyk Security Testing') {
             steps {
                 withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
                     bat "snyk auth ${env.SNYK_API_TOKEN}"
                     bat "snyk test -f -d --all-projects --json > snyk_artifact_report.json"
                 }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                bat './mvnw clean install'
             }
         }
 
